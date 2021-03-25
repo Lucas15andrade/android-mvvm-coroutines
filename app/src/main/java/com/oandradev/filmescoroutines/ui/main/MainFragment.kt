@@ -1,15 +1,14 @@
 package com.oandradev.filmescoroutines.ui.main
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import com.oandradev.filmescoroutines.R
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainFragment : Fragment() {
 
@@ -17,11 +16,13 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by viewModel()
     private lateinit var textView: TextView
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         var view = inflater.inflate(R.layout.main_fragment, container, false)
         textView = view.findViewById(R.id.textViewFilmes)
         return view
@@ -29,10 +30,9 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this, MainViewModel.MainViewModelFactory(MainRepository())).get(MainViewModel::class.java)
 
-        viewModel.filmesLiveData.observe(viewLifecycleOwner, Observer {
-            filmes -> textView.text = filmes[0].titulo
+        viewModel.filmesLiveData.observe(viewLifecycleOwner, Observer { filmes ->
+            textView.text = filmes.map { "${it.id} - ${it.titulo}" }.toString()
         })
 
         viewModel.getFilmesCoroutines()
